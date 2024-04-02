@@ -1,4 +1,4 @@
-from func import squared_part1, squared_part2, squared_part3
+from func import squared_part1, squared_part2, squared_part3, get_location_by_ip
 import pandas as pd
 import numpy as np
 import requests
@@ -45,8 +45,11 @@ def draw_table_ahp(da_list, trees):
     nopr_tfor = int(input("What is the Number of People needed for Flooding in emergency rooms? (2): "))
     nopr_fier = int(input("What is the Number of People needed for Flooding in emergency rooms? (3): "))
     today = datetime.datetime.today()
-    month = calendar.month_name[datetime.datetime.today().month]
-    print(month)
+    day = datetime.datetime.today().day
+    month = datetime.datetime.today().month
+    month_name = calendar.month_name[datetime.datetime.today().month]
+    day_name = calendar.day_name[datetime.datetime.today().day]
+    print(f'Today\'s date is {today}\n{day_name}, {month_name}')
     
     end_day_tfor = today + datetime.timedelta(days=math.floor(rt_tfor/nopr_tfor))
     end_day_fier = end_day_tfor + datetime.timedelta(days=math.floor(rt_fier/nopr_fier))
@@ -60,29 +63,9 @@ def draw_table_ahp(da_list, trees):
     df = pd.DataFrame(data, columns=column_names)
     df.to_excel('test1.xlsx', index=False)
      # Display the DataFrame
-    #print(df)
+    print(df)
 
 
-#Location API 
-def get_location_by_ip():
-    response = requests.get('https://ipinfo.io/')
-    data = response.json()
-    print(data)
-    # Extract required information
-    post_code = data['postal']
-    long, lat = data['loc'].split(',')
-    city = data['city']
-    region = data['region']
-    country = data['country']
-
-    # Construct standard address format
-    address_format = f"{city}, {region}, {country}, Postal Code: {post_code}"
-    
-    # Print the address in standard format
-    print("Your IP location info:", address_format)
-    
-    # Return postal code and longitude as variables
-    return post_code, long, lat, city, region
 
 def calculate_priority_vector(matrix):
     eigenvalues, eigenvectors = np.linalg.eig(matrix)
@@ -91,7 +74,10 @@ def calculate_priority_vector(matrix):
     print(priority_vector)
     return priority_vector
 
-
+organization = input("What is the namme of youur orgaization: ")
+print(f"Welcome to {organization}'s DMS \nBelow is your current location.\n")
+get_location_by_ip()
+print(f"Please complete the information below accurately \n")
 norm_matrix = []
 normalize(squared_part1)
 

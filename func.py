@@ -1,5 +1,5 @@
 import numpy as np
-
+import requests
 
 def get_params_er(num_people_affected_soi, damaged_area_soi):
     #print("This is the scenario for flooding in Emergency rooms. Please enter the values below. \n")
@@ -65,6 +65,29 @@ def LoadExcel():
     # Sort tasks by Priority
     df_sorted = df.sort_values(by='PRIORITY', ascending=False)
     return df_sorted
+
+#Location API 
+def get_location_by_ip():
+    response = requests.get('https://ipinfo.io/')
+    data = response.json()
+    #print("IP Address", data)
+    # Extract required information
+    post_code = data['postal']
+    long, lat = data['loc'].split(',')
+    city = data['city']
+    region = data['region']
+    country = data['country']
+    long,lat = data['loc'].split(',') #: '52.5855,-2.1230
+
+    # Construct standard address format
+    address_format = f"{city}, {region}, {country}, {post_code} \nLongitude: {long}, Latitude: {lat}"
+    
+    # Print the address in standard format
+    print("Here is your current location", address_format)
+    
+    # Return postal code and longitude as variables
+    return address_format
+
 # # Input matrices
 # # print("Input matrix 1:")
 matrix1 = create_matrix_from_values(get_params_er(3,5))
