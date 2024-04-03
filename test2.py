@@ -125,7 +125,7 @@ print(norm_matrix)
 
 def calculate_priority(norm_matrix):
     #print (norm_matrix)
-    ans_da = (norm_matrix[0][1] * norm_matrix[1][0]) + (norm_matrix[2][0] * norm_matrix[0][0]) 
+    ans_da = (norm_matrix[0][1] * norm_matrix[1][0]) + (woi_list * norm_matrix[0][0]) 
     ans_tree = (norm_matrix[1][1] * norm_matrix[0][1]) + (norm_matrix[2][1] * norm_matrix[0][0])
     nopa_list = [norm_matrix[0][1], norm_matrix[0][0], (norm_matrix[0][0] + norm_matrix[0][1])]
     da_list = [norm_matrix[1][0], norm_matrix[2][0], ans_da]

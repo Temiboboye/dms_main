@@ -6,9 +6,9 @@ from func import load_excel
 
 
 df = load_excel()  # Adjust the path to your file
-tasks_now = df.sort_values(by='PRIORITY', ascending=False)
-#print (tasks_now['INSTANCES'])
-data_dict = {column: df[column].tolist() for column in df.columns}
+tasks_now = df.sort_values(by='START DATE', ascending=False)
+print (tasks_now['INSTANCES'])
+data_dict = {column: tasks_now[column].tolist() for column in tasks_now.columns}
 print(data_dict)
 
 tasks = data_dict['INSTANCES']
@@ -44,4 +44,5 @@ ax.set_title('Task 1 Gantt Chart')
 
 # Step 8: Display the chart
 plt.grid(True)
+plt.grid(ls='-.')
 plt.show()
