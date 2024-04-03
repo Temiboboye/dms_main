@@ -2,8 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import matplotlib.dates as mdates
+from func import load_excel
 
-df = pd.read_excel('test1.xlsx')  # Adjust the path to your file
+
+df = load_excel()  # Adjust the path to your file
 tasks_now = df.sort_values(by='PRIORITY', ascending=False)
 #print (tasks_now['INSTANCES'])
 data_dict = {column: df[column].tolist() for column in df.columns}
