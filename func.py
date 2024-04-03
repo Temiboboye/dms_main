@@ -1,5 +1,6 @@
 import numpy as np
 import requests
+import pandas as pd
 
 def get_params_er(num_people_affected_soi, damaged_area_soi):
     #print("This is the scenario for flooding in Emergency rooms. Please enter the values below. \n")
@@ -55,16 +56,16 @@ def normalize_matrix(matrix):
         return matrix  # Return the original matrix if norm is 0 to avoid division by 0
     return matrix / norm
 
-def LoadExcel():
+def load_excel():
     filename= input("Please enter yor file name (without xls):")
     # Load the task data from the provided Excel file
-    file_path = f'{filename}.xls'  # Adjust based on the actual file path
+    file_path = f'{filename}.xlsx'  # Adjust based on the actual file path
     df = pd.read_excel(file_path)
 
     # Assuming the DataFrame has columns: 'Task', 'Priority', 'Resilience Time', 'People Required'
     # Sort tasks by Priority
-    df_sorted = df.sort_values(by='PRIORITY', ascending=False)
-    return df_sorted
+    
+    return df
 
 #Location API 
 def get_location_by_ip():

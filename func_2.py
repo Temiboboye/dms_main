@@ -1,7 +1,8 @@
 import numpy as np
 
 
-def get_params_er(people_affected_scale_er, people_affected_scale_trees, people_affected_scale_fct, people_affected_scale_dgl):
+def get_params_er4(nopa):
+    people_affected_scale_er, people_affected_scale_trees, people_affected_scale_fct, people_affected_scale_dgl = nopa
     #print("This is the scenario for flooding in Emergency rooms. Please enter the values below. ")
     num_people_affected_er = 40
     #people_affected_scale_er = 2
@@ -60,7 +61,7 @@ def square_matrix(matrix):
     return np.dot(matrix, matrix)
 
 
-def create_matrix_from_values(values_4x4):
+def create_matrix_from_values4(values_4x4):
 
     # Given list (assuming it has at least 16 elements; otherwise, fill the remainder with zeros or another placeholder)
     #values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
@@ -87,10 +88,10 @@ def normalize_matrix(matrix):
 
 # # Input matrices
 # print("Input matrix 1:")
-matrix1 = create_matrix_from_values(get_params_er(2,3,8,4)) #3,
-print(matrix1)
+# matrix1 = create_matrix_from_values(get_params_er(2,3,8,4)) #3,
+#print(matrix1)
 # print("Input matrix 2:")
-matrix2 = create_matrix_from_values(get_params_er(4,5,3,9))
+#matrix2 = create_matrix_from_values(get_params_er(4,5,3,9))
 # print("Input matrix 3:")
 #matrix3 = create_matrix_from_values(get_params_er(4,5))
 
@@ -104,8 +105,8 @@ matrix2 = create_matrix_from_values(get_params_er(4,5,3,9))
 
 
 # Now square the concatenated matrix
-squared_part1 = square_matrix(matrix1)
-squared_part2 = square_matrix(matrix2)
+#squared_part1 = square_matrix(matrix1)
+#squared_part2 = square_matrix(matrix2)
 #squared_part3 = square_matrix(matrix3)
 
 # Print the squared matrix

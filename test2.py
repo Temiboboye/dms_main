@@ -1,11 +1,42 @@
-from func_2 import squared_part1, squared_part2 #, squared_part3
-from func import get_location_by_ip  #squared_part2, squared_part3
+from func_2 import create_matrix_from_values4, get_params_er4 # squared_part1, squared_part2 #, squared_part3
+from func import create_matrix_from_values, get_params_er, get_location_by_ip, load_excel, square_matrix, get_location_by_ip  #squared_part2, squared_part3
 import pandas as pd
 import numpy as np
 import requests
 
-def normalize(matrix):
+df = load_excel()
+#df_sorted = df.sort_values(by='PRIORITY', ascending=False)
+data_dict = {column: df[column].tolist() for column in df.columns}
+#print(data_dict)
+nopa = []
+sod = []
+#print(df)
+for i, items in data_dict.items():
+    j = len(items)
     
+    if i != "INSTANCES":
+        #print(i, items)
+        nopa.append(items[0])
+        sod.append(items[1])
+    
+    # for pos in range(j):
+    #     print(items[pos])
+#print(nopa, sod)
+nopa_value = int(input("Number of People Affected(5): "))
+sod_value = int(input("The Severity of Damage(2)"))
+
+main_matrix = create_matrix_from_values(get_params_er(nopa_value,nopa_value))
+
+print(main_matrix)
+
+matrix1 = create_matrix_from_values4(get_params_er4(nopa))
+matrix2 = create_matrix_from_values4(get_params_er4(sod))
+#print (matrix1)
+#print (matrix2)
+
+
+def normalize(matrix):
+
 
     # Extract individual elements from the matrix
     a, b, c, d = matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3]
@@ -34,7 +65,7 @@ def normalize(matrix):
     # print("Print B = " + str(b))
     
     norm_matrix.append(weight)
-    print(round(new_d, 2), "++++++++", round(new_c, 2))
+    print(round(new_a, 2), "++++++++", round(new_b, 2), "++++++++", round(new_c, 2), "++++++++", round(new_d, 2))
     # Return the squared matrix
     return norm_matrix
 
@@ -64,8 +95,10 @@ def calculate_priority_vector(matrix):
     print ("Priority:", priority_vector)
 
 norm_matrix = []
-normalize(squared_part1)
+squared_part1 = square_matrix(matrix1)
+squared_part2 = square_matrix(matrix2)
 
+normalize(squared_part1)
 #print("This is the best of all ")
 normalize(squared_part2)
 
@@ -89,3 +122,19 @@ print(norm_matrix)
 # trees = [norm_matrix[1][1], norm_matrix[2][1], ans_tree]
 # draw_table_ahp(nopa_list, da_list, trees)
 ###
+
+def calculate_priority(norm_matrix):
+    #print (norm_matrix)
+    ans_da = (norm_matrix[0][1] * norm_matrix[1][0]) + (norm_matrix[2][0] * norm_matrix[0][0]) 
+    ans_tree = (norm_matrix[1][1] * norm_matrix[0][1]) + (norm_matrix[2][1] * norm_matrix[0][0])
+    nopa_list = [norm_matrix[0][1], norm_matrix[0][0], (norm_matrix[0][0] + norm_matrix[0][1])]
+    da_list = [norm_matrix[1][0], norm_matrix[2][0], ans_da]
+    #print(f'{ans_da}, \n {ans_tree}, \n{nopa_list}\n {da_list}')
+    if ans_tree > (1 - ans_da):
+        ans_tree = (1 - ans_da)
+    trees = [norm_matrix[2][0], norm_matrix[2][1], ans_tree]
+    print(da_list, trees)
+    return da_list, trees
+#print(ans_tree)
+#print(ans_da)
+result = calculate_priority(norm_matrix)

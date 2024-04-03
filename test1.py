@@ -51,14 +51,14 @@ def draw_table_ahp(priority):
     month = datetime.datetime.today().month
     month_name = calendar.month_name[datetime.datetime.today().month]
     day_name = calendar.day_name[datetime.datetime.today().day]
-    print(f'Today\'s date is {today}\n{day_name}, {month_name}')
+    #print(f'Today\'s date is {today}\n{day_name}, {month_name}')
     total_time = (rt_tfor*nopr_tfor)/daily_working_hours
     total_time_er = (rt_fier*nopr_fier)/daily_working_hours
-    print (total_time)
+    #print (total_time)
     end_day_tfor = today + datetime.timedelta(days=math.floor(total_time))
     end_day_fier = end_day_tfor + datetime.timedelta(days=math.floor(total_time))
      # Initialize the data for the DataFrame
-    print(trees)
+    #print(trees)
     data = [
              ['Trees fell on roads', round(trees[2], 5), rt_tfor, nopr_tfor, total_time, today, end_day_tfor],
              ['Flooding in emergency rooms', da_list[2], rt_fier, nopr_fier, total_time_er, end_day_tfor, end_day_fier]
@@ -88,18 +88,19 @@ normalize(squared_part1)
 normalize(squared_part2)
 normalize(squared_part3)
 
-
+print(norm_matrix)
 
 def calculate_priority(norm_matrix):
-    print (norm_matrix)
+    #print (norm_matrix)
     ans_da = (norm_matrix[0][1] * norm_matrix[1][0]) + (norm_matrix[2][0] * norm_matrix[0][0]) 
     ans_tree = (norm_matrix[1][1] * norm_matrix[0][1]) + (norm_matrix[2][1] * norm_matrix[0][0])
     nopa_list = [norm_matrix[0][1], norm_matrix[0][0], (norm_matrix[0][0] + norm_matrix[0][1])]
     da_list = [norm_matrix[1][0], norm_matrix[2][0], ans_da]
-    print(f'{ans_da}, \n {ans_tree}, \n{nopa_list}\n {da_list}')
+    #print(f'{ans_da}, \n {ans_tree}, \n{nopa_list}\n {da_list}')
     if ans_tree > (1 - ans_da):
         ans_tree = (1 - ans_da)
     trees = [norm_matrix[2][0], norm_matrix[2][1], ans_tree]
+    print(da_list, trees)
     return da_list, trees
 #print(ans_tree)
 #print(ans_da)
