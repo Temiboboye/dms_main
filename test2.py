@@ -1,38 +1,42 @@
 from func_2 import create_matrix_from_values4, get_params_er4 # squared_part1, squared_part2 #, squared_part3
-from func import create_matrix_from_values, get_params_er, get_location_by_ip, load_excel, square_matrix, get_location_by_ip  #squared_part2, squared_part3
+from func import  normalize_matrix, create_matrix_from_values, get_params_er, get_location_by_ip, load_excel, square_matrix, get_location_by_ip  #squared_part2, squared_part3
 import pandas as pd
 import numpy as np
 import requests
+import datetime, calendar, math
 
 df = load_excel()
 #df_sorted = df.sort_values(by='PRIORITY', ascending=False)
 data_dict = {column: df[column].tolist() for column in df.columns}
-#print(data_dict)
+names = []
 nopa = []
 sod = []
 #print(df)
 for i, items in data_dict.items():
     j = len(items)
     
+    
     if i != "INSTANCES":
         #print(i, items)
+        names.append(i)
         nopa.append(items[0])
         sod.append(items[1])
     
     # for pos in range(j):
     #     print(items[pos])
-#print(nopa, sod)
+df = pd.DataFrame(list(zip(names, nopa, sod)),
+                  columns = ["Names", "NOPA", "SOD"], index = None)
+
 nopa_value = int(input("Number of People Affected(5): "))
-sod_value = int(input("The Severity of Damage(2)"))
+sod_value = int(input("The Severity of Damage(2): "))
 
-main_matrix = create_matrix_from_values(get_params_er(nopa_value,nopa_value))
-
-print(main_matrix)
-
+main_matrix = create_matrix_from_values(get_params_er(nopa_value,sod_value))
+woi = normalize_matrix(main_matrix)
+#print(woi[0])
+#print(woi)
 matrix1 = create_matrix_from_values4(get_params_er4(nopa))
 matrix2 = create_matrix_from_values4(get_params_er4(sod))
-#print (matrix1)
-#print (matrix2)
+
 
 
 def normalize(matrix):
@@ -69,21 +73,66 @@ def normalize(matrix):
     # Return the squared matrix
     return norm_matrix
 
-def draw_table_ahp(woi_list, da_list, trees):
+def draw_table_ahp(priority, names):
+    #da_list, trees = priority
+    daily_working_hours = 8
+    column_names = ['INSTANCES', 'PRIORITY', 'RESILIENCE TIME(Hrs)', 'NO. OF PEOPLE REQUIRED', 'TOTAL TIME (Days)', 'START DATE', 'END DATE']
+    rt_tfor = int(input("What is the Resilence Time for Trees fell on roads? (8): "))
+    rt_fier = int(input("What is the Resilence Time for Flooding in emergency rooms? (4): "))
+    rt_dgl = int(input("What is the Resilence Time for Damaged Gas lines? (6): "))
+    rt_fct = int(input("What is the Resilence Time for Falling Cell Towers? (2): "))
+    nopr_tfor = int(input("What is the Number of People needed for Trees fell on roads? (6): "))
+    nopr_fier = int(input("What is the Number of People needed for Flooding in emergency rooms? (2): "))
+    nopr_dgl = int(input("What is the Number of People needed for Damaged Gas lines? (3): "))
+    nopr_fct = int(input("What is the Number of People needed for Falling Cell Towers? (2): "))
+    today = datetime.datetime.today()
+    day = datetime.datetime.today().day
+    month = datetime.datetime.today().month
+    month_name = calendar.month_name[datetime.datetime.today().month]
+    day_name = calendar.day_name[datetime.datetime.today().day]
+    resilience_time = [rt_fier, rt_tfor, rt_fct, rt_dgl]
+    people_required = [nopr_fier, nopr_tfor, nopr_fct, nopr_dgl]
+    total_time = []
+    start_dates = []
+    end_dates = []
+    end_date = today
 
+    names = np.array(names)
+     
+    resilience_time = np.array(resilience_time)
+    people_required = np.array(people_required)
+    priority =  np.array(priority)
+    inds = priority.argsort()
+    sorted_priority = inds[::-1]
+    sorted_people_required = people_required[sorted_priority]
+    sorted_resilience_time = resilience_time[sorted_priority]
+    sorted_names = names[sorted_priority]
+    
+    
+
+    for i in range(len(sorted_resilience_time)):
+        total_days = (sorted_resilience_time[i] * sorted_people_required[i]) / daily_working_hours
+        total_time.append(total_days)
+        start_date = end_date
+        start_dates.append(start_date)
         
-    # Initialize the data for the DataFrame
-    data = {'': ['For No of People affected', 'For Damaged Area', 'Sum of weights of importance'],
-            'Weight of Importance': woi_list,  # Leaving spaces as placeholders
-            'Flooding in emergency rooms': da_list,
-            'Trees fell on roads': trees
-            }
+        # Calculate the end date based on the floor of total_days for the current task
+        end_date = start_date + datetime.timedelta(days=math.floor(total_days))
+        end_dates.append(end_date)
 
+
+    total_time = np.array(total_time) 
+    sorted_total_time = total_time[sorted_priority]
+    #print("Total time", total_time)
     # Create the DataFrame
-    df = pd.DataFrame(data)
-
-    # Display the DataFrame
+    df = pd.DataFrame(list(zip(sorted_names, priority[sorted_priority], sorted_resilience_time, sorted_people_required, total_time, start_dates, end_dates)),
+                  columns = column_names, index = None)
+     
+    
+    df.to_excel('test2.xlsx', index=False)
+     # Display the DataFrame
     print(df)
+
 
 
 
@@ -91,8 +140,9 @@ def calculate_priority_vector(matrix):
     eigenvalues, eigenvectors = np.linalg.eig(matrix)
     max_eigenvector = eigenvectors[:, np.argmax(np.real(eigenvalues))]
     priority_vector = np.real(max_eigenvector / np.sum(max_eigenvector))
-    print("round",round(priority_vector[0],2))
-    print ("Priority:", priority_vector)
+    return priority_vector
+    # print("round",round(priority_vector[0],2))
+    # print ("Priority:", priority_vector)
 
 norm_matrix = []
 squared_part1 = square_matrix(matrix1)
@@ -104,9 +154,9 @@ normalize(squared_part2)
 
 #normalize(squared_part3)
 get_location_by_ip()
-calculate_priority_vector(squared_part1)
-calculate_priority_vector(squared_part2)
-print(norm_matrix)
+for_people_affected = calculate_priority_vector(squared_part1)
+for_severity_damage = calculate_priority_vector(squared_part2)
+#print("PA", for_people_affected[0])
 
 #print(norm_matrix[0][0] + norm_matrix[0][1])
 
@@ -123,18 +173,16 @@ print(norm_matrix)
 # draw_table_ahp(nopa_list, da_list, trees)
 ###
 
-def calculate_priority(norm_matrix):
+def calculate_priority(for_people_affected, for_severity_damage, woi):
     #print (norm_matrix)
-    ans_da = (norm_matrix[0][1] * norm_matrix[1][0]) + (woi_list * norm_matrix[0][0]) 
-    ans_tree = (norm_matrix[1][1] * norm_matrix[0][1]) + (norm_matrix[2][1] * norm_matrix[0][0])
-    nopa_list = [norm_matrix[0][1], norm_matrix[0][0], (norm_matrix[0][0] + norm_matrix[0][1])]
-    da_list = [norm_matrix[1][0], norm_matrix[2][0], ans_da]
-    #print(f'{ans_da}, \n {ans_tree}, \n{nopa_list}\n {da_list}')
-    if ans_tree > (1 - ans_da):
-        ans_tree = (1 - ans_da)
-    trees = [norm_matrix[2][0], norm_matrix[2][1], ans_tree]
-    print(da_list, trees)
-    return da_list, trees
+    woi_er = (for_people_affected[0] * woi[0][0]) + (for_severity_damage[0] * woi[0][1])
+    woi_road= (for_people_affected[1] * woi[0][0]) + (for_severity_damage[1] * woi[0][1])
+    woi_tower = (for_people_affected[2] * woi[0][0]) + (for_severity_damage[2] * woi[0][1] ) 
+    woi_gas = (for_people_affected[3] * woi[0][0]) + (for_severity_damage[3] * woi[0][1])
+    return [round(woi_er, 9), round(woi_road, 9), round(woi_tower, 9), round(woi_gas, 9)]
+    
 #print(ans_tree)
 #print(ans_da)
-result = calculate_priority(norm_matrix)
+result = calculate_priority(for_people_affected, for_severity_damage, woi)
+draw_table_ahp(result, names)
+#print(result)

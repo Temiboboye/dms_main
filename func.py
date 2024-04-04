@@ -50,18 +50,47 @@ def create_matrix_from_values(values):
 #matrix3 = create_matrix_from_values(values3)
 #print(matrix)
 
+# def normalize_matrix(matrix):
+#     norm = np.linalg.norm(matrix)
+#     if norm == 0:
+#         return matrix  # Return the original matrix if norm is 0 to avoid division by 0
+#     return matrix / norm
 def normalize_matrix(matrix):
-    norm = np.linalg.norm(matrix)
-    if norm == 0:
-        return matrix  # Return the original matrix if norm is 0 to avoid division by 0
-    return matrix / norm
+    norm_matrix = []
+    # matrix is a 2x2 matrix represented as [[a, b], [c, d]]
+
+    # Extract individual elements from the matrix
+    a, b, c, d = matrix[0][0], matrix[0][1], matrix[1][0], matrix[1][1]
+
+    # Calculate the sum of all elements in the matrix
+    #total = a + b + c + d
+    total = np.sum(matrix)
+    row_total = a + c
+
+
+    # Calculate the elements of the new matrix
+
+    added = a + b
+    bdded = c + d
+    new_c = added/total
+    new_d = bdded/total
+    weight = [new_d, new_c]
+    # print("Print A = " + str(a))
+    # print("Print B = " + str(b))
+    
+    norm_matrix.append(weight)
+    #print(new_c , " ++++++ ", new_d)
+    # Return the squared matrix
+    return norm_matrix
 
 def load_excel():
     filename= input("Please enter yor file name (without xls):")
     # Load the task data from the provided Excel file
     file_path = f'{filename}.xlsx'  # Adjust based on the actual file path
     df = pd.read_excel(file_path)
-
+    pd.set_option('display.max_rows', 500)
+    pd.set_option('display.max_columns', 500)
+    pd.set_option('display.width', 1000)
     # Assuming the DataFrame has columns: 'Task', 'Priority', 'Resilience Time', 'People Required'
     # Sort tasks by Priority
     
@@ -98,31 +127,8 @@ matrix2 = create_matrix_from_values(get_params_er(2,3))
 matrix3 = create_matrix_from_values(get_params_er(4,5))
 
 
-
-
-# Concatenate matrices vertically
-#part1, part2, part3 = concatenate_matrices(matrix1, matrix2, matrix3, axis=0)
-
-# Now you have three variables part1, part2, and part3 for manipulation.
-#print ("here: ", part1)
-
-# Function to square a matrix using matrix multiplication
-
-
 # # Now square the concatenated matrix
 squared_part1 = square_matrix(matrix1)
 squared_part2 = square_matrix(matrix2)
 squared_part3 = square_matrix(matrix3)
 
-# Print the squared matrix
-# print("Squared Part 1: " + str(squared_part1))
-# print("Squared Part 2: " + str(squared_part2))
-# print("Squared Part 3: " + str(squared_part3))
-
-# normalized_part1 = normalize_matrix(squared_part1)
-# normalized_part2 = normalize_matrix(squared_part2)
-# normalized_part3 = normalize_matrix(squared_part3)
-
-# print("Normalized Part 1: " + str(normalized_part1))
-# print("Normalized Part 2: " + str(normalized_part2))
-# print("Normalized Part 3: " + str(normalized_part3))

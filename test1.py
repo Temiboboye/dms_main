@@ -88,7 +88,7 @@ normalize(squared_part1)
 normalize(squared_part2)
 normalize(squared_part3)
 
-print(norm_matrix)
+#print(norm_matrix)
 
 def calculate_priority(norm_matrix):
     #print (norm_matrix)
