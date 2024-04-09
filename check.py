@@ -46,7 +46,7 @@ def find_next_corresponding_value(file_path, lookup_column, input_value):
         return None
 
 # Example usage
-file_path = 'damaged_area_scale.xlsx'  # Update this to the correct path
+file_path = 'nopa.xlsx'  # Update this to the correct path
 lookup_column = 0  # Assuming the first column is for lookup
 input_value = 40  # Example input value
 

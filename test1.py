@@ -1,4 +1,4 @@
-from func import squared_part1, squared_part2, squared_part3, get_location_by_ip
+from func import create_matrix_from_values, find_next_corresponding_value, square_matrix, get_location_by_ip, get_params_er
 import pandas as pd
 import numpy as np
 import requests
@@ -10,6 +10,50 @@ import calendar
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
+
+
+organization = input("What is the name of your orgaization: ")
+print(f"Welcome to {organization}'s DMS \nBelow is your current location.\n")
+get_location_by_ip()
+print(f"Please complete the information below accurately \n")
+
+
+print("This is the scenario for flooding in Emergency rooms. Please enter the values below. \n")
+num_people_affected_er = int(input("Please enter the number of people affected in 40: "))
+people_affected_scale_er = find_next_corresponding_value('nopa.xlsx', 0, num_people_affected_er) #2
+#print(people_affected_scale_er)
+damaged_area_er = int(input("Please enter the size of the damage area affected (without unit(15)): "))
+damaged_area_scale_er = find_next_corresponding_value('damaged_area_scale.xlsx', 0, damaged_area_er)  #4
+
+print(f"\nThis is the scenario for trees fell on the road. Please enter the values below. ")
+num_people_affected_trees = int(input("Please enter the number of people affected in 80: "))
+people_affected_scale_trees = find_next_corresponding_value('nopa.xlsx', 0, num_people_affected_trees) #3
+damaged_area_trees = int(input("Please enter the number of people affected 25: "))
+damaged_area_scale_trees = find_next_corresponding_value('damaged_area_scale.xlsx', 0, damaged_area_trees) #5
+
+print("Accroding to scale of importance (SOI) from table 6, the values are  ")
+""" No. of people affected => 1
+    Damaged Area (m^2) => 2
+    Time taken for resilience => 3
+    Severity of damage => 4
+"""
+num_people_affected_soi = find_next_corresponding_value('damaged_area_scale.xlsx', 0, 1)  
+damaged_area_soi = find_next_corresponding_value('damaged_area_scale.xlsx', 0, 2)
+
+
+matrix1 = create_matrix_from_values(get_params_er(damaged_area_soi, num_people_affected_soi))
+# print("Input matrix 2:")
+matrix2 = create_matrix_from_values(get_params_er(people_affected_scale_er,people_affected_scale_trees))
+# print("Input matrix 3:")
+matrix3 = create_matrix_from_values(get_params_er(damaged_area_scale_er, damaged_area_scale_trees))
+
+
+# # Now square the concatenated matrix
+squared_part1 = square_matrix(matrix1)
+squared_part2 = square_matrix(matrix2)
+squared_part3 = square_matrix(matrix3)
+
+
 
 def normalize(matrix):
     # matrix is a 2x2 matrix represented as [[a, b], [c, d]]
@@ -44,13 +88,16 @@ def draw_table_ahp(priority):
     column_names = ['INSTANCES', 'PRIORITY', 'RESILIENCE TIME(Hrs)', 'NO. OF PEOPLE REQUIRED', 'TOTAL TIME (Days)', 'START DATE', 'END DATE']
     rt_tfor = int(input("What is the Resilence Time for Trees fell on roads? (8): "))
     rt_fier = int(input("What is the Resilence Time for Flooding in emergency rooms? (4): "))
-    nopr_tfor = int(input("What is the Number of People needed for Flooding in emergency rooms? (2): "))
-    nopr_fier = int(input("What is the Number of People needed for Flooding in emergency rooms? (3): "))
+    
+    nopr_tfor = find_next_corresponding_value('resilence_time_scale.xlsx', 0, rt_tfor) #2
+    print(f"The number of people required is {nopr_tfor}")
+    nopr_fier = find_next_corresponding_value('resilence_time_scale.xlsx', 0, rt_fier) #3
+    print(f"The number of people required is {nopr_fier}")
     today = datetime.datetime.today()
-    day = datetime.datetime.today().day
-    month = datetime.datetime.today().month
-    month_name = calendar.month_name[datetime.datetime.today().month]
-    day_name = calendar.day_name[datetime.datetime.today().day]
+    # day = datetime.datetime.today().day
+    # month = datetime.datetime.today().month
+    # month_name = calendar.month_name[datetime.datetime.today().month]
+    # day_name = calendar.day_name[datetime.datetime.today().day]
     #print(f'Today\'s date is {today}\n{day_name}, {month_name}')
     total_time = (rt_tfor*nopr_tfor)/daily_working_hours
     total_time_er = (rt_fier*nopr_fier)/daily_working_hours
@@ -79,10 +126,7 @@ def draw_table_ahp(priority):
 #     print(priority_vector)
 #     return priority_vector
 
-organization = input("What is the name of your orgaization: ")
-print(f"Welcome to {organization}'s DMS \nBelow is your current location.\n")
-get_location_by_ip()
-print(f"Please complete the information below accurately \n")
+
 norm_matrix = []
 normalize(squared_part1)
 normalize(squared_part2)

@@ -3,6 +3,8 @@ import requests
 import pandas as pd
 
 
+
+
 def find_next_corresponding_value(file_path, lookup_column, input_value):
     """
     Finds the next corresponding value in an Excel file based on the specified rules.
@@ -29,13 +31,13 @@ def find_next_corresponding_value(file_path, lookup_column, input_value):
         
         # Ensure the DataFrame is sorted by the lookup column
         df_sorted = df.sort_values(by=lookup_series.name)
-        
+        print(df_sorted)
         # Find the index of the row that meets the condition
         suitable_index = df_sorted.index[df_sorted[lookup_series.name] >= input_value].min()
-        print(suitable_index)
+        #print(suitable_index)
         # If the input value is less than the first entry, consider the first entry's value
-        if suitable_index == df_sorted.index.min() and input_value < df_sorted.iloc[0][lookup_column]:
-            return df_sorted.iloc[0].iloc[1]
+        if suitable_index == df_sorted.index.min() and input_value <= df_sorted.iloc[0][lookup_column]:
+            return df_sorted.loc[suitable_index].iloc[1] #df_sorted.iloc[0].iloc[1]
         elif suitable_index > df_sorted.index.min():
             # Return the corresponding value from the next row
             return df_sorted.loc[suitable_index].iloc[1]
@@ -50,22 +52,6 @@ def find_next_corresponding_value(file_path, lookup_column, input_value):
 
 
 def get_params_er(num_people_affected_soi, damaged_area_soi):
-    #print("This is the scenario for flooding in Emergency rooms. Please enter the values below. \n")
-    num_people_affected_er = 40
-    people_affected_scale_er = 2
-    damaged_area_er = 15
-    damaged_area_scale_er = 4
-
-    #print(f"\nThis is the scenario for trees fell on the road. Please enter the values below. ")
-
-    num_people_affected_trees = 80 #input("Please enter the number of people affected in 80: ")
-    people_affected_scale_trees = 3 #input("Please enter the number of people affected 3: ")
-    damaged_area_trees = 25 #input("Please enter the number of people affected 25: ")
-    damaged_area_scale_trees = 5 #input("Please enter the scale of damaged area 5: ")
-    
-    #print("Accroding to scale of importance (SOI) from table 6, the values are  ")
-    #num_people_affected_soi = int(input("Please enter the vales for the NOPA;"))
-    #damaged_area_soi = int(input("Please enter the vales for the DA:"))
 
     values = [[(num_people_affected_soi/num_people_affected_soi), (damaged_area_soi/num_people_affected_soi)], [num_people_affected_soi/damaged_area_soi, (damaged_area_soi/damaged_area_soi)]]
 
@@ -134,6 +120,7 @@ def load_excel():
 
 #Location API 
 def get_location_by_ip():
+    
     response = requests.get('https://ipinfo.io/')
     data = response.json()
     #print("IP Address", data)
@@ -154,21 +141,6 @@ def get_location_by_ip():
     # Return postal code and longitude as variables
     return address_format
 
-filename = "nopa.xlsx"
-number_of_people_affected = find_next_corresponding_value(filename, 0, 40)
-# # Input matrices
-print(number_of_people_affected)
 
 
-matrix1 = create_matrix_from_values(get_params_er(3,5))
-# print("Input matrix 2:")
-matrix2 = create_matrix_from_values(get_params_er(2,3))
-# print("Input matrix 3:")
-matrix3 = create_matrix_from_values(get_params_er(4,5))
-
-
-# # Now square the concatenated matrix
-squared_part1 = square_matrix(matrix1)
-squared_part2 = square_matrix(matrix2)
-squared_part3 = square_matrix(matrix3)
 
