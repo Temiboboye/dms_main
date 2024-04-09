@@ -88,37 +88,3 @@ def normalize_matrix(matrix):
 
 # # Input matrices
 # print("Input matrix 1:")
-# matrix1 = create_matrix_from_values(get_params_er(2,3,8,4)) #3,
-#print(matrix1)
-# print("Input matrix 2:")
-#matrix2 = create_matrix_from_values(get_params_er(4,5,3,9))
-# print("Input matrix 3:")
-#matrix3 = create_matrix_from_values(get_params_er(4,5))
-
-# Concatenate matrices vertically
-#part1, part2, part3 = concatenate_matrices(matrix1, matrix2, matrix3, axis=0)
-
-# Now you have three variables part1, part2, and part3 for manipulation.
-#print ("here: ", part1)
-
-# Function to square a matrix using matrix multiplication
-
-
-# Now square the concatenated matrix
-#squared_part1 = square_matrix(matrix1)
-#squared_part2 = square_matrix(matrix2)
-#squared_part3 = square_matrix(matrix3)
-
-# Print the squared matrix
-#print("Squared Part 1: " + str(squared_part1))
-
-
-#normalized_part1 = normalize_matrix(squared_part1)
-# normalized_part2 = normalize_matrix(squared_part2)
-# normalized_part3 = normalize_matrix(squared_part3)
-
-
-#total_sum = np.sum(squared_part1)
-#normalized_matrix = squared_part1 / total_sum
-
-#print(normalized_matrix)

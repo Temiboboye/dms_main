@@ -14,14 +14,12 @@ sod = []
 #print(df)
 for i, items in data_dict.items():
     j = len(items)
-    
-    
     if i != "INSTANCES":
         #print(i, items)
         names.append(i)
         nopa.append(items[0])
         sod.append(items[1])
-    
+print(names)   
     # for pos in range(j):
     #     print(items[pos])
 df = pd.DataFrame(list(zip(names, nopa, sod)),
@@ -31,9 +29,10 @@ nopa_value = int(input("Number of People Affected(5): "))
 sod_value = int(input("The Severity of Damage(2): "))
 
 main_matrix = create_matrix_from_values(get_params_er(nopa_value,sod_value))
-woi = normalize_matrix(main_matrix)
-#print(woi[0])
-#print(woi)
+square_main_matrix = square_matrix(main_matrix)
+woi = normalize_matrix((square_main_matrix))
+print(woi[0])
+print(woi)
 matrix1 = create_matrix_from_values4(get_params_er4(nopa))
 matrix2 = create_matrix_from_values4(get_params_er4(sod))
 
@@ -86,10 +85,10 @@ def draw_table_ahp(priority, names):
     nopr_dgl = int(input("What is the Number of People needed for Damaged Gas lines? (3): "))
     nopr_fct = int(input("What is the Number of People needed for Falling Cell Towers? (2): "))
     today = datetime.datetime.today()
-    day = datetime.datetime.today().day
-    month = datetime.datetime.today().month
-    month_name = calendar.month_name[datetime.datetime.today().month]
-    day_name = calendar.day_name[datetime.datetime.today().day]
+    #day = datetime.datetime.today().day
+    #month = datetime.datetime.today().month
+    #month_name = calendar.month_name[datetime.datetime.today().month]
+    #day_name = calendar.day_name[datetime.datetime.today().day]
     resilience_time = [rt_fier, rt_tfor, rt_fct, rt_dgl]
     people_required = [nopr_fier, nopr_tfor, nopr_fct, nopr_dgl]
     total_time = []
@@ -179,6 +178,7 @@ def calculate_priority(for_people_affected, for_severity_damage, woi):
     woi_road= (for_people_affected[1] * woi[0][0]) + (for_severity_damage[1] * woi[0][1])
     woi_tower = (for_people_affected[2] * woi[0][0]) + (for_severity_damage[2] * woi[0][1] ) 
     woi_gas = (for_people_affected[3] * woi[0][0]) + (for_severity_damage[3] * woi[0][1])
+    #Show the result for th
     return [round(woi_er, 9), round(woi_road, 9), round(woi_tower, 9), round(woi_gas, 9)]
     
 #print(ans_tree)

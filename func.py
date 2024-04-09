@@ -2,6 +2,53 @@ import numpy as np
 import requests
 import pandas as pd
 
+
+def find_next_corresponding_value(file_path, lookup_column, input_value):
+    """
+    Finds the next corresponding value in an Excel file based on the specified rules.
+    
+    Parameters:
+    - file_path: str, path to the Excel file
+    - lookup_column: int or str, index or name of the column to look up the input_value
+    - input_value: float, the value to find the corresponding value for
+    
+    Returns:
+    - The found corresponding value from the next row based on the rules, or None if not found.
+    """
+    try:
+        df = pd.read_excel(file_path)
+        
+        # Ensure lookup_column is valid
+        if isinstance(lookup_column, int):
+            lookup_series = df.iloc[:, lookup_column]
+        elif isinstance(lookup_column, str):
+            lookup_series = df[lookup_column]
+        else:
+            print("Invalid lookup_column provided.")
+            return None
+        
+        # Ensure the DataFrame is sorted by the lookup column
+        df_sorted = df.sort_values(by=lookup_series.name)
+        
+        # Find the index of the row that meets the condition
+        suitable_index = df_sorted.index[df_sorted[lookup_series.name] >= input_value].min()
+        print(suitable_index)
+        # If the input value is less than the first entry, consider the first entry's value
+        if suitable_index == df_sorted.index.min() and input_value < df_sorted.iloc[0][lookup_column]:
+            return df_sorted.iloc[0].iloc[1]
+        elif suitable_index > df_sorted.index.min():
+            # Return the corresponding value from the next row
+            return df_sorted.loc[suitable_index].iloc[1]
+        else:
+            return None
+    except ValueError:
+        # This handles the case where no rows meet the condition
+        return None
+    except Exception as e:
+        print(f"Error processing the file: {e}")
+        return None
+
+
 def get_params_er(num_people_affected_soi, damaged_area_soi):
     #print("This is the scenario for flooding in Emergency rooms. Please enter the values below. \n")
     num_people_affected_er = 40
@@ -44,17 +91,6 @@ def create_matrix_from_values(values):
     matrix = np.array(values)
     return matrix
 
-# Example usage
-#values = get_params_er()
-#matrix = create_matrix_from_values(get_params_er())
-#matrix3 = create_matrix_from_values(values3)
-#print(matrix)
-
-# def normalize_matrix(matrix):
-#     norm = np.linalg.norm(matrix)
-#     if norm == 0:
-#         return matrix  # Return the original matrix if norm is 0 to avoid division by 0
-#     return matrix / norm
 def normalize_matrix(matrix):
     norm_matrix = []
     # matrix is a 2x2 matrix represented as [[a, b], [c, d]]
@@ -118,8 +154,12 @@ def get_location_by_ip():
     # Return postal code and longitude as variables
     return address_format
 
+filename = "nopa.xlsx"
+number_of_people_affected = find_next_corresponding_value(filename, 0, 40)
 # # Input matrices
-# # print("Input matrix 1:")
+print(number_of_people_affected)
+
+
 matrix1 = create_matrix_from_values(get_params_er(3,5))
 # print("Input matrix 2:")
 matrix2 = create_matrix_from_values(get_params_er(2,3))

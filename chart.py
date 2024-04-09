@@ -4,12 +4,11 @@ import pandas as pd
 import matplotlib.dates as mdates
 from func import load_excel
 
-
 df = load_excel()  # Adjust the path to your file
 tasks_now = df.sort_values(by='START DATE', ascending=False)
 print (tasks_now['INSTANCES'])
 data_dict = {column: tasks_now[column].tolist() for column in tasks_now.columns}
-print(data_dict)
+print(data_dict['START DATE'])
 
 tasks = data_dict['INSTANCES']
 start_dates = data_dict['START DATE']
@@ -38,8 +37,8 @@ ax.set_xlim(min_date, max_date)
 ax.xaxis_date()
 ax.xaxis.set_major_locator(mdates.WeekdayLocator())
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m'))
-ax.set_xlabel('Date')
-ax.set_ylabel('Tasks')
+ax.set_xlabel('DATES')
+ax.set_ylabel('INSTANCES')
 ax.set_title('Task 1 Gantt Chart')
 
 # Step 8: Display the chart
