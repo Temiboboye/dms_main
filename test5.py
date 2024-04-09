@@ -1,12 +1,12 @@
+from func import load_excel()
 import pandas as pd
 from collections import defaultdict, OrderedDict
 import math
 from datetime import datetime, timedelta
 
 # Load the Excel file
-file_path = 'out.xls'  # Update this path to your file
-df = pd.read_excel(file_path)
-
+load_excel()
+print(df)
 # Constants
 total_hours_per_day = 200
 daily_hours_per_worker = 8

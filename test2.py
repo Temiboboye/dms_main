@@ -85,10 +85,7 @@ def draw_table_ahp(priority, names):
     nopr_dgl = int(input("What is the Number of People needed for Damaged Gas lines? (3): "))
     nopr_fct = int(input("What is the Number of People needed for Falling Cell Towers? (2): "))
     today = datetime.datetime.today()
-    #day = datetime.datetime.today().day
-    #month = datetime.datetime.today().month
-    #month_name = calendar.month_name[datetime.datetime.today().month]
-    #day_name = calendar.day_name[datetime.datetime.today().day]
+    
     resilience_time = [rt_fier, rt_tfor, rt_fct, rt_dgl]
     people_required = [nopr_fier, nopr_tfor, nopr_fct, nopr_dgl]
     total_time = []
