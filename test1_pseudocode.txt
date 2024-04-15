@@ -1,89 +1,77 @@
-Program TaskHourAllocation
-    // User inputs for file path and configurations
-    Prompt user "Please enter the name of your file including the extension"
-    Read file_path from user
+Main Program:
+    Print "Please enter the name of your organization:"
+    Read organization
+    Print "Welcome to " + organization + "'s DMS"
+    Print "Below is your current location."
+    Call GetLocationByIP
+    
+    Print "This is the scenario for flooding in Emergency rooms. Please enter the values below:"
+    Print "Please enter the number of people affected:"
+    Read num_people_affected_er
+    people_affected_scale_er = Call FindNextCorrespondingValue with parameters ('nopa.xlsx', 0, num_people_affected_er)
+    
+    Print "Please enter the size of the damage area affected (without unit):"
+    Read damaged_area_er
+    damaged_area_scale_er = Call FindNextCorrespondingValue with parameters ('damaged_area_scale.xlsx', 0, damaged_area_er)
+    
+    Print "This is the scenario for trees fell on the road. Please enter the values below:"
+    Print "Please enter the number of people affected:"
+    Read num_people_affected_trees
+    people_affected_scale_trees = Call FindNextCorrespondingValue with parameters ('nopa.xlsx', 0, num_people_affected_trees)
+    
+    Print "Please enter the number of trees affected:"
+    Read damaged_area_trees
+    damaged_area_scale_trees = Call FindNextCorrespondingValue with parameters ('damaged_area_scale.xlsx', 0, damaged_area_trees)
+    
+    num_people_affected_soi = Call FindNextCorrespondingValue with parameters ('damaged_area_scale.xlsx', 0, 1)
+    damaged_area_soi = Call FindNextCorrespondingValue with parameters ('damaged_area_scale.xlsx', 0, 2)
+    
+    matrix1 = Call CreateMatrixFromValues with parameter get_params_er(damaged_area_soi, num_people_affected_soi)
+    matrix2 = Call CreateMatrixFromValues with parameter get_params_er(people_affected_scale_er, people_affected_scale_trees)
+    matrix3 = Call CreateMatrixFromValues with parameter get_params_er(damaged_area_scale_er, damaged_area_scale_trees)
+    
+    squared_part1 = Call SquareMatrix with parameter matrix1
+    squared_part2 = Call SquareMatrix with parameter matrix2
+    squared_part3 = Call SquareMatrix with parameter matrix3
+    
+    Call Normalize with parameter squared_part1
+    Call Normalize with parameter squared_part2
+    Call Normalize with parameter squared_part3
+    
+    result = Call CalculatePriority with parameter norm_matrix
+    Call DrawTableAHP() with parameter result
 
-    // Load data from the specified Excel file
-    df = LoadExcel(file_path)
+Function FindNextCorrespondingValue(file_path, lookup_column, input_value):
+    Load DataFrame df from file_path
+    Validate lookup_column type
+    Sort df by lookup_column
+    Identify the correct row based on input_value
+    If suitable row is identified:
+        Return the corresponding value from the next row
+    Else:
+        Return None
 
-    // Define constants
-    Set total_hours_per_day = 200
-    Set daily_hours_per_worker = 8
-    Set total_number_of_workers = 25
-    Set start_date = CurrentDateTime()
+Function CreateMatrixFromValues(values):
+    Convert values to a numpy array
+    Return the numpy array
 
-    // Calculate the required hours for each task
-    df['Required Hours'] = df['RESIL TIM(Hrs)'] * df['PEP RQ']
-    df_sorted = Sort df by 'PRIORITY' in descending order
+Function SquareMatrix(matrix):
+    Return the matrix squared
 
-    // Initialize tracking structures
-    Initialize tasks_daily_hours as a dictionary of ordered dictionaries
-    Initialize tasks_start_end_dates as a dictionary of dictionaries with 'Start_Date' and 'End_Date' keys
-    Initialize daily_totals as a dictionary to track total daily hours utilized
+Function Normalize(matrix):
+    Normalize the matrix based on total sum of elements
+    Return the normalized matrix
 
-    // Main allocation loop: allocate hours for all tasks based on availability and constraints
-    For each row in df_sorted do
-        Call AllocateTaskHours with parameters (row['TASKS'], row['Required Hours'], row['PEP RQ'])
-    EndFor
+Function CalculatePriority(norm_matrix):
+    Calculate priorities based on normalized matrices
+    Return calculated priorities
 
-    // Prepare the tasks_per_day_df DataFrame from the tasks_daily_hours dictionary
-    tasks_per_day_df = Convert tasks_daily_hours to DataFrame
+Function DrawTableAHP(priority):
+    Calculate additional parameters based on priorities
+    Draw and format a table based on these parameters
+    Save the table to an Excel file
 
-    // Filter tasks_per_day_df to only include columns with hours assigned or relevant dates
-    FilterColumns tasks_per_day_df to include days with work or start/end dates
-
-    // Convert date times to readable format and calculate duration
-    For each task in tasks_per_day_df do
-        tasks_per_day_df['Start_Date'] for task = FormatDate(tasks_start_end_dates[task]['Start_Date'])
-        tasks_per_day_df['End_Date'] for task = FormatDate(tasks_start_end_dates[task]['End_Date'])
-        tasks_per_day_df['DURATION'] for task = DifferenceInDays(tasks_start_end_dates[task]['End_Date'], tasks_start_end_dates[task]['Start_Date']) + 1
-    EndFor
-
-    // Prepare DataFrame for final output
-    tasks_per_day_df_reset = ResetIndex of tasks_per_day_df with 'INSTANCES' as the new index column
-    Rename columns of df_sorted for clarity
-    merged_df = Merge df_sorted with tasks_per_day_df_reset on 'INSTANCES'
-
-    // Display and save the final merged DataFrame
-    Print First few rows of merged_df
-    Save merged_df to Excel file at 'updated_test5.xlsx'
-    Print "Data saved to updated_test5.xlsx. Please check your file."
-End Program
-
-Function AllocateTaskHours(task_id, required_hours, pep_rq)
-    Set current_day = 1
-
-    While required_hours > 0 do
-        Calculate available_workers_today based on pep_rq and daily_totals
-        Calculate max_hours_today based on available_workers_today
-        Calculate available_hours_today based on max_hours_today and daily_totals
-
-        If available_hours_today <= 0 then
-            Increment current_day
-            Continue
-        EndIf
-
-        Set hours_allocated_today = Minimum of (required_hours, available_hours_today)
-        Update tasks_daily_hours for task_id on current_day by hours_allocated_today
-        Update daily_totals for current_day by hours_allocated_today
-        Reduce required_hours by hours_allocated_today
-
-        If Start_Date for task_id is not set then
-            Set Start_Date for task_id to (start_date + (current_day - 1 days))
-        EndIf
-
-        Set End_Date for task_id to (start_date + (current_day - 1 days))
-
-        If required_hours > 0 then
-            Increment current_day
-        EndIf
-    EndWhile
-End Function
-
-Function FormatDate(datetime)
-    Return datetime formatted as 'DD-MMM'
-End Function
-
-Function DifferenceInDays(end_date, start_date)
-    Return (end_date - start_date) in days
-End Function
+Function GetLocationByIP():
+    Fetch data from IP info service
+    Extract and print the location details
+    Return the formatted address
