@@ -1,0 +1,89 @@
+Program TaskHourAllocation
+    // User inputs for file path and configurations
+    Prompt user "Please enter the name of your file including the extension"
+    Read file_path from user
+
+    // Load data from the specified Excel file
+    df = LoadExcel(file_path)
+
+    // Define constants
+    Set total_hours_per_day = 200
+    Set daily_hours_per_worker = 8
+    Set total_number_of_workers = 25
+    Set start_date = CurrentDateTime()
+
+    // Calculate the required hours for each task
+    df['Required Hours'] = df['RESIL TIM(Hrs)'] * df['PEP RQ']
+    df_sorted = Sort df by 'PRIORITY' in descending order
+
+    // Initialize tracking structures
+    Initialize tasks_daily_hours as a dictionary of ordered dictionaries
+    Initialize tasks_start_end_dates as a dictionary of dictionaries with 'Start_Date' and 'End_Date' keys
+    Initialize daily_totals as a dictionary to track total daily hours utilized
+
+    // Main allocation loop: allocate hours for all tasks based on availability and constraints
+    For each row in df_sorted do
+        Call AllocateTaskHours with parameters (row['TASKS'], row['Required Hours'], row['PEP RQ'])
+    EndFor
+
+    // Prepare the tasks_per_day_df DataFrame from the tasks_daily_hours dictionary
+    tasks_per_day_df = Convert tasks_daily_hours to DataFrame
+
+    // Filter tasks_per_day_df to only include columns with hours assigned or relevant dates
+    FilterColumns tasks_per_day_df to include days with work or start/end dates
+
+    // Convert date times to readable format and calculate duration
+    For each task in tasks_per_day_df do
+        tasks_per_day_df['Start_Date'] for task = FormatDate(tasks_start_end_dates[task]['Start_Date'])
+        tasks_per_day_df['End_Date'] for task = FormatDate(tasks_start_end_dates[task]['End_Date'])
+        tasks_per_day_df['DURATION'] for task = DifferenceInDays(tasks_start_end_dates[task]['End_Date'], tasks_start_end_dates[task]['Start_Date']) + 1
+    EndFor
+
+    // Prepare DataFrame for final output
+    tasks_per_day_df_reset = ResetIndex of tasks_per_day_df with 'INSTANCES' as the new index column
+    Rename columns of df_sorted for clarity
+    merged_df = Merge df_sorted with tasks_per_day_df_reset on 'INSTANCES'
+
+    // Display and save the final merged DataFrame
+    Print First few rows of merged_df
+    Save merged_df to Excel file at 'updated_test5.xlsx'
+    Print "Data saved to updated_test5.xlsx. Please check your file."
+End Program
+
+Function AllocateTaskHours(task_id, required_hours, pep_rq)
+    Set current_day = 1
+
+    While required_hours > 0 do
+        Calculate available_workers_today based on pep_rq and daily_totals
+        Calculate max_hours_today based on available_workers_today
+        Calculate available_hours_today based on max_hours_today and daily_totals
+
+        If available_hours_today <= 0 then
+            Increment current_day
+            Continue
+        EndIf
+
+        Set hours_allocated_today = Minimum of (required_hours, available_hours_today)
+        Update tasks_daily_hours for task_id on current_day by hours_allocated_today
+        Update daily_totals for current_day by hours_allocated_today
+        Reduce required_hours by hours_allocated_today
+
+        If Start_Date for task_id is not set then
+            Set Start_Date for task_id to (start_date + (current_day - 1 days))
+        EndIf
+
+        Set End_Date for task_id to (start_date + (current_day - 1 days))
+
+        If required_hours > 0 then
+            Increment current_day
+        EndIf
+    EndWhile
+End Function
+
+Function FormatDate(datetime)
+    Return datetime formatted as 'DD-MMM'
+End Function
+
+Function DifferenceInDays(end_date, start_date)
+    Return (end_date - start_date) in days
+End Function
